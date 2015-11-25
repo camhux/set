@@ -71,20 +71,15 @@ func isSet(a, b, c card) bool {
 	return true
 }
 
-// getThirdCard takes two cards and returns a representation of the
+// findComplement takes two cards and returns a representation of the
 // card that, if found, would complete a set with the two given cards.
-func getThirdCard(a, b card) card {
+func findComplement(a, b card) card {
 	var c card
 	for i := range c {
 		if a[i] == b[i] {
 			c[i] = a[i]
 		} else {
-			switch sum := a[i] + b[i]; sum {
-			case 1:
-				c[i] = sum + 1
-			case 2:
-				c[i] = sum - 1
-			}
+			c[i] = (a[i] + b[i]) ^ 3
 		}
 	}
 	return c
@@ -160,8 +155,49 @@ func (b *board) dealTwelve() {
 // If a valid set is found, the cards are returned and
 // `found` is true; if there's no valid set, `set` is nil
 // and `found` is false.
-func (b *board) findSet() (set []card, found bool) {
+func (b *board) findSet() (set []struct {
+	card
+	index int
+}, found bool) {
+	mem := make(map[card]int)
 
+	for i, card := range b.table {
+		mem[card] = i
+	}
+
+outer:
+	for i := range b.table {
+	inner:
+		for j := i; j < len(b.table); j++ {
+
+			comp := findComplement(b.table[i], b.table[j])
+
+			if compIx, ok := mem[comp]; ok {
+				found = true
+				set = []struct {
+					card
+					index int
+				}{
+					{
+						b.table[i],
+						i,
+					},
+					{
+						b.table[j],
+						j,
+					},
+					{
+						comp,
+						compIx,
+					},
+				}
+
+				break outer
+			}
+		}
+	}
+
+	return
 }
 
 // startGame creates and shuffles a new deck, associates this deck with
