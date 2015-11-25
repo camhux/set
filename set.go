@@ -1,9 +1,11 @@
 package main
 
-// import (
-// 	"fmt"
-// 	"math/rand"
-// )
+import (
+	// 	"fmt"
+	"math/rand"
+	"strings"
+	"time"
+)
 
 // card represents a unique combination of the four attributes.
 type card [4]int
@@ -16,39 +18,76 @@ const (
 	number
 )
 
-// Color
-const (
-	red = iota
-	green
-	purple
-)
-
-// Shape
-const (
-	diamond = iota
-	squiggle
-	oval
-)
+// Number
+var numbers = map[int]string{
+	0: "one",
+	1: "two",
+	2: "three",
+}
 
 // Fill
-const (
-	solid = iota
-	empty
-	striped
-)
+var fills = map[int]string{
+	0: "solid",
+	1: "empty",
+	2: "striped",
+}
 
-// Number
-const (
-	one = iota
-	two
-	three
-)
+// Color
+var colors = map[int]string{
+	0: "red",
+	1: "green",
+	2: "purple",
+}
+
+// Shape
+var shapes = map[int]string{
+	0: "diamond",
+	1: "squiggle",
+	2: "oval",
+}
+
+// card.String returns a stringifed representation of the card's attributes.
+func (c *card) String() string {
+	attributes := []string{
+		numbers[c[number]],
+		fills[c[fill]],
+		colors[c[color]],
+		shapes[c[shape]],
+	}
+	if c[number] > 0 {
+		attributes[3] = attributes[3] + "s"
+	}
+	return strings.Join(attributes, " ")
+}
 
 // isSet takes in three cards, returning `true` if they
 // compose a set and `false` if not.
 func isSet(a, b, c card) bool {
-	// UNIMPLEMENTED
+	for i := range a {
+		if (a[i]+b[i]+c[i])%3 != 0 {
+			return false
+		}
+	}
 	return true
+}
+
+// getThirdCard takes two cards and returns a representation of the
+// card that, if found, would complete a set with the two given cards.
+func getThirdCard(a, b card) card {
+	var c card
+	for i := range c {
+		if a[i] == b[i] {
+			c[i] = a[i]
+		} else {
+			switch sum := a[i] + b[i]; sum {
+			case 1:
+				c[i] = sum + 1
+			case 2:
+				c[i] = sum - 1
+			}
+		}
+	}
+	return c
 }
 
 // generateDeck returns a new, unshuffled slice of cards.
@@ -59,8 +98,8 @@ func generateDeck() []card {
 
 	for i := range deck {
 		deck[i] = buffer
-		// Inefficiency: this inner loop runs even when i = len(deck)-1
-		// and calculating the next buffer state is unnecessary
+		// Inefficiency: this inner loop runs even when i = len(deck)-1,
+		// at which point calculating the next buffer state is unnecessary
 		for j, val := range buffer {
 			if val == 2 {
 				buffer[j] = 0
@@ -78,7 +117,15 @@ func generateDeck() []card {
 
 // shuffleDeck performs an in-place shuffle upon a slice of cards.
 func shuffleDeck(deck []card) {
-	// UNIMPLEMENTED
+	rand.Seed(time.Now().UnixNano())
+	for i := len(deck) - 1; i > 0; i-- {
+		randIx := rand.Intn(i + 1)
+		if randIx != i {
+			temp := deck[randIx]
+			deck[randIx] = deck[i]
+			deck[i] = temp
+		}
+	}
 }
 
 // board represents a group of dealt cards (the table) and
@@ -109,9 +156,20 @@ func (b *board) dealTwelve() {
 	b.deck = b.deck[12:]
 }
 
-// startGame receives a deck and returns the address of a new board.
-// The board retains a reference to its source deck for further dealing.
-func startGame(deck []card) *board {
-	// UNIMPLEMENTED
-	return &board{}
+// findSet searches the board's table for a valid set.
+// If a valid set is found, the cards are returned and
+// `found` is true; if there's no valid set, `set` is nil
+// and `found` is false.
+func (b *board) findSet() (set []card, found bool) {
+
+}
+
+// startGame creates and shuffles a new deck, associates this deck with
+// a new board, deals out twelve cards to the board's table, then returns
+// the address of the board.
+func newGame() *board {
+	deck := shuffleDeck(generateDeck())
+	b := &board{deck: deck}
+	b.dealTwelve()
+	return b
 }
