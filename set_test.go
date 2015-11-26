@@ -280,5 +280,58 @@ func TestFindSet(t *testing.T) {
 }
 
 func TestClearSet(t *testing.T) {
+	var b board
+	var set [3]card
+	var expected, actual []card
+
+	check := func(expected, actual []card) {
+		if len(expected) != len(actual) {
+			t.Error("Mismatched lengths between expected table and actual")
+		}
+
+		for i := range expected {
+			if expected[i] != actual[i] {
+				t.Error("Mismatched cards between expected table and actual")
+			}
+		}
+	}
+
+	b.table = []card{
+		{0, 0, 0, 0},
+		{0, 0, 0, 1},
+		{0, 0, 0, 2},
+		{0, 0, 1, 0},
+		{0, 0, 1, 1},
+		{0, 0, 1, 2},
+		{0, 0, 2, 0},
+		{0, 0, 2, 1},
+		{0, 0, 2, 2},
+		{0, 1, 0, 0},
+		{0, 1, 0, 1},
+		{0, 1, 0, 2},
+	}
+
+	set = [3]card{
+		{0, 0, 1, 0},
+		{0, 0, 2, 1},
+		{0, 1, 0, 2},
+	}
+
+	expected = []card{
+		{0, 0, 0, 0},
+		{0, 0, 0, 1},
+		{0, 0, 0, 2},
+		{0, 0, 1, 1},
+		{0, 0, 1, 2},
+		{0, 0, 2, 0},
+		{0, 0, 2, 2},
+		{0, 1, 0, 0},
+		{0, 1, 0, 1},
+	}
+
+	b.clearSet(set)
+	actual = b.table
+
+	check(expected, actual)
 
 }
