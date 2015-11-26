@@ -198,7 +198,7 @@ func (b *board) dealTwelve() {
 
 // findSet searches the board's table for a valid set.
 // If a valid set is found, the cards are returned and
-// `found` is true; if there's no valid set, `set` is nil
+// `found` is true; if there's no valid set, `set` is zeroed
 // and `found` is false.
 func (b *board) findSet() (set [3]card, found bool) {
 	// First, we create a map of cards to indices by looping through
