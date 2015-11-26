@@ -23,7 +23,7 @@ func main() {
 // card represents a unique combination of the four attributes.
 type card [4]int
 
-// Attribute indices
+// Attribute index constants
 const (
 	color = iota
 	shape
@@ -102,17 +102,30 @@ func isSet(a, b, c card) bool {
 // card that, if found, would complete a set with the two given cards.
 func complement(a, b card) card {
 	var c card
+
 	for i := range c {
 		if a[i] == b[i] {
+			// If attribute `i` is homogeneous between a and b,
+			// c should be the same.
 			c[i] = a[i]
 		} else {
+			// If attribute `i` is heterogeneous, c must be complement a and b.
+			// Attributes (as integers in range [0..2]) are represented by two bits.
+			// By using 3 (0b11) as a mask for a XOR against the sum of a[i] and b[i],
+			// we can calculate the necessary complement.
+			// For example:
+			// 0 + 1 = 1 (0b01). 0b01 ^ 0b11 = 0b10 = 2, the correct complement to 0 and 1.
+			// 1 + 2 = 3 (0b11). 0b11 ^ 0b11 = 0b00 = 0, etc.
 			c[i] = (a[i] + b[i]) ^ 3
 		}
 	}
+
 	return c
 }
 
 // generateDeck returns a new, unshuffled slice of cards.
+// It uses an integer array of length 4 to calculate 81 unique cards
+// by essentially counting from 0 to 80 in big-endian base 3.
 func generateDeck() []card {
 	var buffer [4]int
 
