@@ -75,6 +75,10 @@ func (c card) String() string {
 
 // isSet takes in three cards, returning `true` if they
 // compose a set and `false` if not.
+//
+// isSet is not actually used in any of the other set-finding
+// functions; instead, the rest of the program uses complement-checking
+// to identify sets.
 func isSet(a, b, c card) bool {
 	// Because we've modeled attributes as integers 0 <= n <= 2,
 	// we can test validity by taking a sum of each card's values
@@ -158,7 +162,7 @@ type board struct {
 // a board's source deck. If canDeal -> false and table -> empty,
 // the game is over.
 func (b *board) canDeal() bool {
-	return len(b.deck) > 0
+	return len(b.deck) >= 3
 }
 
 // dealThree slices off three cards from the board's source deck
