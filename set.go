@@ -240,7 +240,7 @@ outer:
 	}
 	// Because our return values are named, we use a bare return here.
 	// If we found a set, the values have been properly assigned.
-	// If we haven't, we return nil/false, which is useful.
+	// If we haven't, we return nil/false.
 	return
 }
 
