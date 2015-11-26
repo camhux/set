@@ -1,11 +1,24 @@
 package main
 
 import (
-	// 	"fmt"
+	"fmt"
 	"math/rand"
 	"strings"
 	"time"
 )
+
+func main() {
+	game := newGame()
+	var done bool
+
+	for !done {
+		done = game.play()
+	}
+
+	for i, set := range game.sets {
+		fmt.Printf("Set %2d:\n\t%v\n\t%v\n\t%v\n", i+1, set[0], set[1], set[2])
+	}
+}
 
 // card represents a unique combination of the four attributes.
 type card [4]int
@@ -47,7 +60,7 @@ var shapes = map[int]string{
 }
 
 // card.String returns a stringifed representation of the card's attributes.
-func (c *card) String() string {
+func (c card) String() string {
 	attributes := []string{
 		numbers[c[number]],
 		fills[c[fill]],
@@ -138,6 +151,7 @@ func shuffleDeck(deck []card) {
 type board struct {
 	table []card
 	deck  []card
+	sets  [][3]card
 }
 
 // canDeal describes whether more cards can be dealt from
@@ -190,13 +204,13 @@ func (b *board) findSet() (set [3]card, found bool) {
 	// return statement, which is part structural, part stylistic decision.
 outer:
 	for i := range b.table {
-		for j := i; j < len(b.table); j++ {
+		for j := i + 1; j < len(b.table); j++ {
 			// Here, for each pair of cards as we iterate through the table,
 			// we calculate which third card would create a complete set if present.
 			comp := complement(b.table[i], b.table[j])
 
 			// Next, we check to see if that third card is on the table.
-			if compIx, ok := mem[comp]; ok {
+			if _, ok := mem[comp]; ok {
 				// If it is, we mark our `found` return value as true, and we instantiate
 				// and assign a results array containing the cards of the set we've found.
 				found = true
@@ -221,7 +235,7 @@ func (b *board) clearSet(set [3]card) {
 	// which `append` makes convenient, but we also don't want to
 	// repeatedly allocate a new underlying array when it's not
 	// necessary, so we create the slice with length 0 but adequate capacity.
-	t := make([]card, 0, len(b.table)-3)
+	t := make([]card, 0, 27)
 
 outer:
 	for _, card := range b.table {
@@ -232,15 +246,20 @@ outer:
 		}
 		t = append(t, card)
 	}
+
+	b.table = t
 }
 
 // newGame creates and shuffles a new deck, associates this deck with
 // a new board, deals out twelve cards to the board's table, then returns
 // the address of the board.
 func newGame() *board {
-	deck := shuffleDeck(generateDeck())
+	deck := generateDeck()
+	shuffleDeck(deck)
+
 	b := &board{deck: deck}
 	b.dealTwelve()
+
 	return b
 }
 
@@ -249,6 +268,23 @@ func newGame() *board {
 // out more cards if necessary. If no set is found, play will deal out three more
 // cards, then return and cede control. play returns true if the game is finished
 // (i.e., no more sets and no more cards to deal) and false if the game can continue.
-func (b *board) play(log []string) (done bool) {
+func (b *board) play() (done bool) {
+	set, found := b.findSet()
 
+	if found {
+		b.sets = append(b.sets, set)
+		b.clearSet(set)
+		done = false
+		if b.canDeal() {
+			b.dealThree()
+		}
+	} else {
+		if b.canDeal() {
+			b.dealThree()
+		} else {
+			done = true
+		}
+	}
+
+	return
 }
