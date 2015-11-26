@@ -105,8 +105,7 @@ func complement(a, b card) card {
 
 	for i := range c {
 		if a[i] == b[i] {
-			// If attribute `i` is homogeneous between a and b,
-			// c should be the same.
+			// If attribute `i` is homogeneous between a and b, c should be the same.
 			c[i] = a[i]
 		} else {
 			// If attribute `i` is heterogeneous, c must be complement a and b.
@@ -135,8 +134,11 @@ func generateDeck() []card {
 
 	for i := range deck {
 		deck[i] = buffer
-		// Inefficiency: this inner loop runs even when i = len(deck)-1,
-		// at which point calculating the next buffer state is unnecessary
+
+		if i == len(deck)-1 {
+			break
+		}
+
 		for j, val := range buffer {
 			if val == 2 {
 				buffer[j] = 0
