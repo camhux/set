@@ -161,15 +161,6 @@ func (b *board) dealTwelve() {
 	b.deck = b.deck[12:]
 }
 
-// setMember associates a card with an index at which it was found.
-// An array of three setMembers will comprise a set.
-// `card` is conveniently embedded (why name it anything else?),
-// and this also allows us to invoke .String directly on setMember.
-type setMember struct {
-	card
-	index int
-}
-
 // findSet searches the board's table for a valid set.
 // If a valid set is found, the cards are returned and
 // `found` is true; if there's no valid set, `set` is nil
@@ -178,7 +169,7 @@ type setMember struct {
 // For each card in `set`, there's both the card value as well
 // as the index in the table slice at which it was found.
 // This enables later removal of these cards from the table.
-func (b *board) findSet() (set [3]setMember, found bool) {
+func (b *board) findSet() (set [3]card, found bool) {
 	// First, we create a map of cards to indices by looping through
 	// the table and inserting each card. This helps amortize the work
 	// of checking permutations of sets, since for any pair of cards
@@ -207,22 +198,9 @@ outer:
 			// Next, we check to see if that third card is on the table.
 			if compIx, ok := mem[comp]; ok {
 				// If it is, we mark our `found` return value as true, and we instantiate
-				// and assign a results array containing the setMembers of the set we've found.
+				// and assign a results array containing the cards of the set we've found.
 				found = true
-				set = [3]setMember{
-					{
-						b.table[i],
-						i,
-					},
-					{
-						b.table[j],
-						j,
-					},
-					{
-						comp,
-						compIx,
-					},
-				}
+				set = [3]card{b.table[i], b.table[j], comp}
 				// Here, we break the outer loop, since a set has been found and there's
 				// no point in continuing to look.
 				break outer
@@ -237,7 +215,7 @@ outer:
 
 // clearSet takes a set of cards as input and replaces the board's
 // table with a slice omitting the cards of the set.
-func (b *board) clearSet(set [3]setMember) {
+func (b *board) clearSet(set [3]card) {
 	// Here we create the slice that will become the new table.
 	// We want to shift cards around to new indices to fill the gaps,
 	// which `append` makes convenient, but we also don't want to
