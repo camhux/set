@@ -247,7 +247,7 @@ outer:
 // clearSet takes a set of cards as input and replaces the board's
 // table with a slice omitting the cards of the set.
 func (b *board) clearSet(set [3]card) {
-	// Here we create the slice that will become the new table.
+	// Here, we create the slice that will become the new table.
 	// We want to shift cards around to new indices to fill the gaps,
 	// which `append` makes convenient, but we also don't want to
 	// repeatedly allocate a new underlying array when it's not
