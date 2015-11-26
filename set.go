@@ -124,8 +124,10 @@ func complement(a, b card) card {
 }
 
 // generateDeck returns a new, unshuffled slice of cards.
-// It uses an integer array of length 4 to calculate 81 unique cards
-// by essentially counting from 0 to 80 in big-endian base 3.
+// It modifies a single integer array and repeatedly copies it
+// into the deck to create 81 unique cards. The process of modifying
+// the buffer array is conceptually similar to counting from 0 to 80
+// in big-endian base 3, with each index as a digit of the number.
 func generateDeck() []card {
 	var buffer [4]int
 
