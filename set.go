@@ -176,8 +176,7 @@ type board struct {
 }
 
 // canDeal describes whether more cards can be dealt from
-// a board's source deck. If canDeal -> false and table -> empty,
-// the game is over.
+// a board's source deck.
 func (b *board) canDeal() bool {
 	return len(b.deck) >= 3
 }
