@@ -129,9 +129,156 @@ func TestCanDeal(t *testing.T) {
 }
 
 func TestDealThree(t *testing.T) {
+	var b board
+	var expected, actual []card
+
+	check := func(expected, actual []card) {
+		if len(expected) != len(actual) {
+			t.Error("Mismatched length between expected table and actual")
+		}
+
+		for i := range expected {
+			if expected[i] != actual[i] {
+				t.Error("Mismatched cards between expected table and actual")
+			}
+		}
+	}
+
+	b = board{}
+	b.deck = []card{
+		{0, 0, 0, 0},
+		{0, 0, 0, 1},
+		{0, 0, 0, 2},
+		{0, 0, 1, 0},
+		{0, 0, 1, 1},
+		{0, 0, 1, 2},
+		{0, 0, 2, 0},
+		{0, 0, 2, 1},
+		{0, 0, 2, 2},
+	}
+
+	b.dealThree()
+	expected = []card{
+		{0, 0, 0, 0},
+		{0, 0, 0, 1},
+		{0, 0, 0, 2},
+	}
+	actual = b.table
+	check(expected, actual)
+
+	b.dealThree()
+	expected = []card{
+		{0, 0, 0, 0},
+		{0, 0, 0, 1},
+		{0, 0, 0, 2},
+		{0, 0, 1, 0},
+		{0, 0, 1, 1},
+		{0, 0, 1, 2},
+	}
+	actual = b.table
+	check(expected, actual)
 
 }
 
 func TestDealTwelve(t *testing.T) {
+	var b board
+	var expected, actual []card
+
+	check := func(expected, actual []card) {
+		if len(expected) != len(actual) {
+			t.Error("Mismatched length between expected table and actual")
+		}
+
+		for i := range expected {
+			if expected[i] != actual[i] {
+				t.Error("Mismatched cards between expected table and actual")
+			}
+		}
+	}
+
+	b = board{}
+	b.deck = []card{
+		{0, 0, 0, 0},
+		{0, 0, 0, 1},
+		{0, 0, 0, 2},
+		{0, 0, 1, 0},
+		{0, 0, 1, 1},
+		{0, 0, 1, 2},
+		{0, 0, 2, 0},
+		{0, 0, 2, 1},
+		{0, 0, 2, 2},
+		{0, 1, 0, 0},
+		{0, 1, 0, 1},
+		{0, 1, 0, 2},
+		{0, 1, 1, 0},
+		{0, 1, 1, 1},
+		{0, 1, 1, 2},
+	}
+
+	b.dealTwelve()
+	expected = []card{
+		{0, 0, 0, 0},
+		{0, 0, 0, 1},
+		{0, 0, 0, 2},
+		{0, 0, 1, 0},
+		{0, 0, 1, 1},
+		{0, 0, 1, 2},
+		{0, 0, 2, 0},
+		{0, 0, 2, 1},
+		{0, 0, 2, 2},
+		{0, 1, 0, 0},
+		{0, 1, 0, 1},
+		{0, 1, 0, 2},
+	}
+	actual = b.table
+	check(expected, actual)
+}
+
+func TestFindSet(t *testing.T) {
+	var b board
+	var expected, actual [3]card
+	var ok bool
+
+	check := func(expected, actual [3]card) {
+		if expected != actual {
+			t.Errorf("Expected %v from `b.findSet`; got %v", expected, actual)
+		}
+	}
+
+	b.table = []card{
+		{0, 0, 0, 0},
+		{0, 1, 1, 1},
+		{0, 1, 2, 0},
+		{0, 2, 1, 0},
+		{1, 0, 1, 0},
+		{2, 0, 2, 0},
+	}
+
+	expected = [3]card{
+		{0, 0, 0, 0},
+		{0, 1, 2, 0},
+		{0, 2, 1, 0},
+	}
+	actual, _ = b.findSet()
+	check(expected, actual)
+
+	b.table = []card{
+		{0, 0, 0, 0},
+		{0, 0, 0, 1},
+		{0, 1, 0, 2},
+		{1, 0, 1, 0},
+		{2, 1, 1, 0},
+		{1, 1, 1, 1},
+	}
+	expected = [3]card{}
+	actual, ok = b.findSet()
+	if ok {
+		t.Error("Expected set to not be found")
+	}
+	check(expected, actual)
+
+}
+
+func TestClearSet(t *testing.T) {
 
 }
