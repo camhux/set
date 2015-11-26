@@ -151,33 +151,46 @@ func (b *board) dealTwelve() {
 	b.deck = b.deck[12:]
 }
 
+// setMember associates a card with an index at which it was found.
+// An array of three setMembers will comprise a set.
+// `card` is conveniently embedded (why name it anything else?),
+// and this also allows us to invoke .String directly on setMember.
+type setMember struct {
+	card
+	index int
+}
+
 // findSet searches the board's table for a valid set.
 // If a valid set is found, the cards are returned and
 // `found` is true; if there's no valid set, `set` is nil
 // and `found` is false.
-func (b *board) findSet() (set []struct {
-	card
-	index int
-}, found bool) {
+//
+// For each card in `set`, there's both the card value as well
+// as the index in the table slice at which it was found.
+// This enables later removal of these cards from the table.
+func (b *board) findSet() (set [3]setMember, found bool) {
+
 	mem := make(map[card]int)
 
 	for i, card := range b.table {
 		mem[card] = i
 	}
 
+	// We label this outer loop so we can break the entire search
+	// operation once a set has been identified in the inner loop.
+	//
+	// An alternative would be to return immediately upon identifying
+	// the set, but using this break allows us to use only a single
+	// return statement, which is part structural, part stylistic decision.
 outer:
 	for i := range b.table {
-	inner:
 		for j := i; j < len(b.table); j++ {
 
 			comp := findComplement(b.table[i], b.table[j])
 
 			if compIx, ok := mem[comp]; ok {
 				found = true
-				set = []struct {
-					card
-					index int
-				}{
+				set = [3]setMember{
 					{
 						b.table[i],
 						i,
@@ -196,7 +209,9 @@ outer:
 			}
 		}
 	}
-
+	// Because our return values are named, we use a bare return here.
+	// If we found a set, the values have been properly assigned.
+	// If we haven't, we return nil/false, which is useful.
 	return
 }
 
