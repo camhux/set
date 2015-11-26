@@ -200,10 +200,6 @@ func (b *board) dealTwelve() {
 // If a valid set is found, the cards are returned and
 // `found` is true; if there's no valid set, `set` is nil
 // and `found` is false.
-//
-// For each card in `set`, there's both the card value as well
-// as the index in the table slice at which it was found.
-// This enables later removal of these cards from the table.
 func (b *board) findSet() (set [3]card, found bool) {
 	// First, we create a map of cards to indices by looping through
 	// the table and inserting each card. This helps amortize the work
