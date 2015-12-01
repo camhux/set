@@ -59,7 +59,7 @@ var shapes = map[int]string{
 	2: "oval",
 }
 
-// card.String returns a stringifed representation of the card's attributes.
+// card.String returns a stringified representation of the card's attributes.
 func (c card) String() string {
 	attributes := []string{
 		numbers[c[number]],
